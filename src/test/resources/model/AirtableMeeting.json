@@ -1,0 +1,71 @@
+{
+  "id": "ValidId",
+  "createdTime": "2019-12-11T21:30:21.000Z",
+  "fields": {
+    "Meeting Date": "2019-12-11",
+    "Ah-Um Counter": [
+      "recx9Gq7KVtpYYDxf"
+    ],
+    "Attended": [
+      "recSNQj2tl0uBisZa",
+      "recZ3F2o9rAFuYpD8",
+      "recLcoCN8pjK4vXFL",
+      "recJtUOWwwWnRdVf4",
+      "recwXoFDiJg8O8xQ7",
+      "recj25IOjqY35nwZR",
+      "recCrymCuFkC9ZlZq",
+      "rec0pIuBbk4R746An",
+      "rect9A4zUkEgIl5Ef",
+      "rec9glWgFrJAx7eiA",
+      "rec2vJU1jPRDVxh9h",
+      "recbRqvr0EQ4Ief4Y",
+      "reciRT9L0nKxMBbEZ",
+      "recWlCvVTrn6hh3En",
+      "recx9Gq7KVtpYYDxf",
+      "recJ8FYp2NuBqhPzh",
+      "recbdyrSwql2L6AnO",
+      "recH6dLjGRa2pThco",
+      "recFCl6MFa6rUSx1a",
+      "recexPxpwf6GiPB31",
+      "recjBUpem9yucIZQt",
+      "reclEtJRiBL292pJ0",
+      "recOuJ461SUmVqBzn"
+    ],
+    "General Evaluator": [
+      "recZ3F2o9rAFuYpD8"
+    ],
+    "Grammarian": [
+      "rec9glWgFrJAx7eiA"
+    ],
+    "Round Robin": [
+      "recwXoFDiJg8O8xQ7"
+    ],
+    "Speech": [
+      "recJtUOWwwWnRdVf4"
+    ],
+    "Speech Evaluator": [
+      "rec0pIuBbk4R746An"
+    ],
+    "Table Topics": [
+      "recSNQj2tl0uBisZa"
+    ],
+    "Timer": [
+      "recj25IOjqY35nwZR"
+    ],
+    "Word and Thought": [
+      "recWlCvVTrn6hh3En"
+    ],
+    "Table Topics Leader": [
+      "recwXoFDiJg8O8xQ7"
+    ],
+    "Table Topics Evaluator": [
+      "rect9A4zUkEgIl5Ef"
+    ],
+    "Date First Attended": [
+      "recbdyrSwql2L6AnO",
+      "recexPxpwf6GiPB31",
+      "recjBUpem9yucIZQt",
+      "reclEtJRiBL292pJ0"
+    ]
+  }
+}

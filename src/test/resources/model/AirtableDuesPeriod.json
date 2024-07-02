@@ -1,0 +1,29 @@
+{
+  "id": "ValidId",
+  "createdTime": "2019-12-09T18:43:29.000Z",
+  "fields": {
+    "Due Period": "Spring 2020 10/1/19-3/30/20",
+    "Status": "Unpaid",
+    "Person": [
+      "recOYl7XDWnklxiOj",
+      "reci90XwmJs6Cl4Gd",
+      "recIAZ9R4Lhi4KBdp",
+      "recPvFsgIcnzQBWFB",
+      "recPBPOO8tFuBuAX5",
+      "recnxZVxWTGG3BaEZ",
+      "recCMRo00vCULD1E4",
+      "recaRvhp0g9gSMpoV",
+      "recdjPpewlqRNjd7W",
+      "recyehMKgs1aVrdI7",
+      "recou3MvXLyuwS0nc",
+      "rec7PcpKX73jdTVi6",
+      "recic5L1US9mwEQVt"
+    ],
+    "Start": "2019-10-01",
+    "End": "2020-03-31",
+    "Next Cycle?": "No",
+    "Current Cycle?": "No",
+    "Total": 13,
+    "Total Paid": 0
+  }
+}

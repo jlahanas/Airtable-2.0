@@ -1,0 +1,115 @@
+{
+  "id": "ValidId",
+  "createdTime": "2018-05-16T00:33:57.000Z",
+  "fields": {
+    "Last Name": "Smith",
+    "First Name": "John",
+    "Email Address": "johnsmith@johnsmith.com",
+    "Address": "This is the address of John Smith",
+    "Phone": "(555) 555-5555",
+    "Speech": [
+      "recGJMdnmXpfUOhw0"
+    ],
+    "Attended": [
+      "rec2hbG6khFbW4ksZ",
+      "recRMQIl87TNGAGMQ"
+    ],
+    "Dues Cycles Listed": [
+      "reckavvasJhMFeGqv",
+      "recFuSB8sWSnyTgHz"
+    ],
+    "Member Onboarding Status": "Onboarding Completed",
+    "Notes": "Some notes",
+    "Photo": [
+      {
+        "id": "attX3fqahApqStoHF"
+      }
+    ],
+    "Member Outreach Status": "Guided/HasBuddy",
+    "Lead": {
+      "id": "usrYlM000000a9M0k",
+      "email": "lead@email.com",
+      "name": "Lead Name"
+    },
+    "Buddy/Guide": [
+      "recGAH00000oU8YBE"
+    ],
+    "Activity Summary": "Activity Summary",
+    "Word and Thought of the Day": [
+      "recTUMDEya9AbR2kg"
+    ],
+    "Table Topics Leader": [
+      "recvDNVXAToUzUIbV",
+      "recTUMDEya9AbR2kg"
+    ],
+    "Toastmaster": [
+      "rec3vbcevtzy47GBu",
+      "receDQlucgx1aoJzZ"
+    ],
+    "Timer": [
+      "rec7p4GQdp91mWDrc",
+      "recGOYjBA03CL824a"
+    ],
+    "Table Topics Evaluator": [
+      "recKNHr0vcaMkVNvN",
+      "receFoNk9opgxUglm"
+    ],
+    "Table Topics": [
+      "reclOV4TFctinPrRJ",
+      "recPwEfsgaCU74Y5m"
+    ],
+    "Speech Evaluator": [
+      "recsiBh2bbnfOMZal",
+      "recHLiyJBhh5aTKO7"
+    ],
+    "Rant": [
+      "recJxR9PUcdiAmOMW",
+      "recKNHr0vcaMkVNvN"
+    ],
+    "Humorist": [
+      "recvGGpLacBHOOFjm",
+      "rec3vbcevtzy47GBu"
+    ],
+    "Grammarian": [
+      "rect0F9XbaKb5MNk5"
+    ],
+    "General Evaluator": [
+      "recaC4oGth5X6l8t4",
+      "recwlZFytoGYcNjF0"
+    ],
+    "Last Attended Date": "2023-12-12",
+    "Type": "Member/Officer",
+    "TMI Registration": "Registered",
+    "Status": "Active",
+    "Dues Notes": "Dues Notes",
+    "Dues Credit": true,
+    "TMI Dues Cycles Listed": [
+      "rechre55uklosuQ9a"
+    ],
+    "Created Date/Time": "2018-05-16T00:33:57.000Z",
+    "Name": "Full Name",
+    "Dues Last Paid": "2023-10-01",
+    "Next Dues": "Unpaid",
+    "Reminder Emails": "Yes",
+    "Dues": "Unpaid",
+    "TMI Membership": "Expired",
+    "Cycle (from TMI Dues Cycles Listed)": [
+      "Fall 2022 10/1/21-3/31/22"
+    ],
+    "Last Attended": "2022-09-14",
+    "Last Toastmaster": "2021-03-10",
+    "Last Timer": "2019-08-28",
+    "Last Word and Thought": "2021-02-24",
+    "Last Humorist": "2021-03-10",
+    "Last Speech": "2019-08-14",
+    "Last Rant": "2020-11-11",
+    "Last Table Topics Leader": "2021-02-24",
+    "Last Table Topics": "2019-05-22",
+    "Last General Evaluator": "2021-01-13",
+    "Last Speech Evaluator": "2021-01-13",
+    "Last Table Topics Evaluator": "2021-01-13",
+    "Last Grammarian": "2020-01-22",
+    "Last Meeting Attended": "9/14/2022",
+    "Attendance Status": "Inactive"
+  }
+}
