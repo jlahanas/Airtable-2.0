@@ -2,9 +2,14 @@ package com.speakupcambridge.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record AirtablePerson(String id, String createdTime, AirtablePersonFields fields)
+@Entity
+public record AirtablePerson(
+    @Id String id, String createdTime, @Embedded AirtablePersonFields fields)
     implements AirtableRecord {
   @JsonIgnoreProperties(ignoreUnknown = true)
   public record AirtablePersonFields(

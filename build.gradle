@@ -22,6 +22,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.mockito:mockito-core:3.11.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    runtimeOnly 'mysql:mysql-connector-java'
 
 //    implementation 'org.springframework.boot:spring-boot-gradle-plugin:3.3.1'
 //    implementation 'org.springframework.boot:spring-boot-starter-web:3.3.1'
