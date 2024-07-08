@@ -1,16 +1,8 @@
 package com.speakupcambridge.config;
 
-import com.speakupcambridge.model.AirtableDuesPeriod;
-import com.speakupcambridge.model.AirtableMeeting;
-import com.speakupcambridge.model.AirtablePerson;
-import com.speakupcambridge.model.AirtableRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
-import java.util.Objects;
 
 @Component
 @ConfigurationProperties
@@ -21,7 +13,6 @@ public class AirtableConfig {
   public final String personsTable;
   public final String meetingsTable;
   public final String duesPeriodsTable;
-  public final Map<Class<? extends AirtableRecord>, String> airtableClassTableMap;
 
   public AirtableConfig(
       @Value("${airtable.server.base_url}") String baseUrl,
@@ -36,13 +27,5 @@ public class AirtableConfig {
     this.personsTable = personsTable;
     this.meetingsTable = meetingsTable;
     this.duesPeriodsTable = duesPeriodsTable;
-    this.airtableClassTableMap =
-        Map.of(
-            AirtablePerson.class,
-            personsTable,
-            AirtableMeeting.class,
-            meetingsTable,
-            AirtableDuesPeriod.class,
-            duesPeriodsTable);
   }
 }

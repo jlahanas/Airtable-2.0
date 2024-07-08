@@ -2,35 +2,84 @@ package com.speakupcambridge.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
-public record AirtablePerson(
-    @Id String id, String createdTime, @Embedded AirtablePersonFields fields)
-    implements AirtableRecord {
+@NoArgsConstructor
+@Getter
+@Setter
+@Table(name = "airtable_persons_raw_data")
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class AirtablePerson extends AirtableRecord {
+  @Embedded private AirtablePersonFields fields;
+
   @JsonIgnoreProperties(ignoreUnknown = true)
-  public record AirtablePersonFields(
-      @JsonProperty("First Name") String firstName,
-      @JsonProperty("Last Name") String lastName,
-      @JsonProperty("Name") String name,
-      @JsonProperty("Email Address") String email,
-      @JsonProperty("Address") String address,
-      @JsonProperty("Phone") String phone,
-      @JsonProperty("Type") String type,
-      @JsonProperty("Status") String status,
-      @JsonProperty("Attendance Status") String attendanceStatus,
-      @JsonProperty("Dues Last Paid") String duesLastPaid,
-      @JsonProperty("Dues") String dues,
-      @JsonProperty("Next Dues") String nextDues,
-      @JsonProperty("Reminder Emails") String reminderEmails,
-      @JsonProperty("Last Attended") String lastAttendedDate,
-      @JsonProperty("Last Speech") String lastSpeechDate,
-      @JsonProperty("TMI Membership") String tmiMembership,
-      @JsonProperty("TMI Status") String tmiStatus,
-      @JsonProperty("TMI Registration") String tmiRegistration,
-      @JsonProperty("Dues Credit") String duesCredit,
-      @JsonProperty("Dues Notes") String duesNotes) {}
+  @Embeddable
+  @NoArgsConstructor
+  @Getter
+  @Setter
+  public static class AirtablePersonFields {
+    @JsonProperty("First Name")
+    private String firstName;
+
+    @JsonProperty("Last Name")
+    private String lastName;
+
+    @JsonProperty("Name")
+    private String name;
+
+    @JsonProperty("Email Address")
+    private String email;
+
+    @JsonProperty("Address")
+    private String address;
+
+    @JsonProperty("Phone")
+    private String phone;
+
+    @JsonProperty("Type")
+    private String type;
+
+    @JsonProperty("Status")
+    private String status;
+
+    @JsonProperty("Attendance Status")
+    private String attendanceStatus;
+
+    @JsonProperty("Dues Last Paid")
+    private String duesLastPaid;
+
+    @JsonProperty("Dues")
+    private String dues;
+
+    @JsonProperty("Next Dues")
+    private String nextDues;
+
+    @JsonProperty("Reminder Emails")
+    private String reminderEmails;
+
+    @JsonProperty("Last Attended")
+    private String lastAttendedDate;
+
+    @JsonProperty("Last Speech")
+    private String lastSpeechDate;
+
+    @JsonProperty("TMI Membership")
+    private String tmiMembership;
+
+    @JsonProperty("TMI Status")
+    private String tmiStatus;
+
+    @JsonProperty("TMI Registration")
+    private String tmiRegistration;
+
+    @JsonProperty("Dues Credit")
+    private String duesCredit;
+
+    @JsonProperty("Dues Notes")
+    private String duesNotes;
+  }
 }

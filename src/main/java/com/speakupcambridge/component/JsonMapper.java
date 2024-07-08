@@ -1,4 +1,4 @@
-package com.speakupcambridge.util;
+package com.speakupcambridge.component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -6,14 +6,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.speakupcambridge.exceptions.UnexpectedJsonFormatException;
 import com.speakupcambridge.model.AirtableRecord;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@Component
 public class JsonMapper {
   public static String RECORD_LIST_FIELD = "records";
+  public static String OFFSET_FIELD = "offset";
   private final ObjectMapper mapper;
 
   public JsonMapper() {
@@ -57,5 +60,17 @@ public class JsonMapper {
       entityList.add(mapper.convertValue(record, toValueType));
     }
     return entityList;
+  }
+
+  public String getOffset(String json) {
+    JsonNode root;
+    try {
+      root = this.mapper.readTree(json);
+    } catch (JsonProcessingException e) {
+      throw new UnexpectedJsonFormatException(e);
+    }
+
+    JsonNode offsetNode = root.get(OFFSET_FIELD);
+    return Objects.nonNull(offsetNode) ? offsetNode.asText() : null;
   }
 }

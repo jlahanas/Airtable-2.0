@@ -3,9 +3,11 @@ package com.speakupcambridge.repository;
 import com.speakupcambridge.exceptions.UnexpectedJsonFormatException;
 import com.speakupcambridge.model.AirtableRecord;
 import com.speakupcambridge.service.AirtableRestService;
-import com.speakupcambridge.util.JsonMapper;
+import com.speakupcambridge.component.JsonMapper;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public abstract class RemoteAirtableRepository<T extends AirtableRecord>
@@ -40,7 +42,15 @@ public abstract class RemoteAirtableRepository<T extends AirtableRecord>
   @Override
   public List<T> findAll() {
     String json = this.airtableRestService.fetchRecords(this.tableName);
-    return this.jsonMapper.mapList(json, this.entityType);
+    List<T> records = this.jsonMapper.mapList(json, this.entityType);
+    String offset = this.jsonMapper.getOffset(json);
+    while (Objects.nonNull(offset) && !offset.isEmpty()) {
+      json = this.airtableRestService.fetchRecords(this.tableName, offset);
+      records.addAll(this.jsonMapper.mapList(json, this.entityType));
+      offset = this.jsonMapper.getOffset(json);
+    }
+
+    return records;
   }
 
   @Override

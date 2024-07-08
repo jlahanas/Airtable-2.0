@@ -4,17 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.speakupcambridge.exceptions.UnexpectedJsonFormatException;
+import com.speakupcambridge.util.RestUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
 
 @Service
 public class MailchimpRestService {
@@ -23,35 +20,31 @@ public class MailchimpRestService {
   private final String serverId;
   private final String bearerToken;
 
-  private final RestTemplate restTemplate;
   private final ObjectMapper mapper;
+  private final HttpClient httpClient;
 
   public MailchimpRestService(
       @Value("${mailchimp.server.base_url}") String baseUrl,
       @Value("${mailchimp.server.id}") String serverId,
-      @Value("${mailchimp.api.token}") String bearerToken,
-      RestTemplate restTemplate) {
+      @Value("${mailchimp.api.token}") String bearerToken) {
     this.baseUrl = baseUrl.replace("{mailchimp.server.id}", serverId);
     this.serverId = serverId;
     this.bearerToken = bearerToken;
-    this.restTemplate = restTemplate;
+    this.httpClient = HttpClient.newHttpClient();
 
     this.mapper = new ObjectMapper();
   }
 
   public String fetchLists() {
-    String fullUrl = String.format("%s/lists", this.baseUrl);
-    return restTemplate
-        .exchange(fullUrl, HttpMethod.GET, buildAuthHeader(), String.class)
-        .getBody();
+    return processResponseBody(
+        RestUtils.submitGetRequest(this.httpClient, listsUrl(), this.bearerToken));
   }
 
   public String fetchMembers(String listId) {
     String fullUrl =
         String.format("%s/members?count=%d", listUrl(listId), MAX_ENTITIES_PER_REQUEST);
-    return this.restTemplate
-        .exchange(fullUrl, HttpMethod.GET, buildAuthHeader(), String.class)
-        .getBody();
+    return processResponseBody(
+        RestUtils.submitGetRequest(this.httpClient, fullUrl, this.bearerToken));
   }
 
   public String fetchMembers(String listId, int count, int offset) {
@@ -63,9 +56,8 @@ public class MailchimpRestService {
     }
 
     String fullUrl = String.format("%s/members?count=%d&offset=%d", listUrl(listId), count, offset);
-    return this.restTemplate
-        .exchange(fullUrl, HttpMethod.GET, buildAuthHeader(), String.class)
-        .getBody();
+    return processResponseBody(
+        RestUtils.submitGetRequest(this.httpClient, fullUrl, this.bearerToken));
   }
 
   private HttpEntity<String> buildAuthHeader() {
@@ -76,7 +68,14 @@ public class MailchimpRestService {
   }
 
   private String listUrl(String listId) {
-    return String.format("%s/lists/%s", this.baseUrl, listId);
+    if (listId.isEmpty()) {
+      return listsUrl();
+    }
+    return String.format("%s/%s", listsUrl(), listId);
+  }
+
+  private String listsUrl() {
+    return String.format("%s/lists", this.baseUrl);
   }
 
   private int getListMemberCount(String listId) {
@@ -101,5 +100,14 @@ public class MailchimpRestService {
       }
     }
     return -1;
+  }
+
+  private String processResponseBody(HttpResponse<String> response) {
+    if (response.statusCode() != 200) {
+      throw new RuntimeException(
+          String.format("Request returned a %d response", response.statusCode()));
+    }
+
+    return response.body();
   }
 }

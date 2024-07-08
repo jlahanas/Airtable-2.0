@@ -1,5 +1,6 @@
 package com.speakupcambridge;
 
+import testUtils.FileUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.speakupcambridge.model.AirtablePerson;
@@ -27,7 +28,7 @@ public class AirtableModelTest {
     String jsonString = null;
     AirtablePerson airtablePerson = null;
     try {
-      jsonString = readJsonFile(jsonFilePath);
+      jsonString = FileUtils.readJsonFile(jsonFilePath);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -41,9 +42,9 @@ public class AirtableModelTest {
 
     // THEN it maps correctly
     assert Objects.nonNull(airtablePerson);
-    assert Objects.nonNull(airtablePerson.createdTime());
-    assert Objects.nonNull(airtablePerson.id());
-    assert Objects.nonNull(airtablePerson.fields().firstName());
+    assert Objects.nonNull(airtablePerson.getCreatedTime());
+    assert Objects.nonNull(airtablePerson.getId());
+    assert Objects.nonNull(airtablePerson.getFields().getFirstName());
   }
 
   private String readJsonFile(String filePath) throws IOException {

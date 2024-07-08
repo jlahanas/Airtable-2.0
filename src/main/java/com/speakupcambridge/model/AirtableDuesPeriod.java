@@ -1,21 +1,36 @@
 package com.speakupcambridge.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record AirtableDuesPeriod(String id, String createdTime, AirtableDuesPeriodFields fields)
-    implements AirtableRecord {
+@Entity
+@NoArgsConstructor
+@Getter
+@Setter
+@Table(name = "airtable_dues_raw_data")
+public class AirtableDuesPeriod extends AirtableRecord {
+  @Embedded private AirtableDuesPeriodFields fields;
+
   @JsonIgnoreProperties(ignoreUnknown = true)
-  public record AirtableDuesPeriodFields(
-      String duePeriod,
-      String status,
-      List<String> personIds,
-      String start,
-      String end,
-      String nextCycle,
-      String currentCycle,
-      String total,
-      String totalPaid) {}
+  @Embeddable
+  @NoArgsConstructor
+  @Getter
+  @Setter
+  public static class AirtableDuesPeriodFields {
+    private String duePeriod;
+    private String status;
+    private List<String> personIds;
+    private String start;
+    private String end;
+    private String nextCycle;
+    private String currentCycle;
+    private String total;
+    private String totalPaid;
+  }
 }

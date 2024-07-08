@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id "org.springframework.boot" version "3.3.1"
     id "io.spring.dependency-management" version "1.1.5"
+    id "io.freefair.lombok" version "8.6"
 }
 
 group = 'com.speakupcambridge'
@@ -22,7 +23,17 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.mockito:mockito-core:3.11.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    runtimeOnly 'mysql:mysql-connector-java'
+    runtimeOnly 'mysql:mysql-connector-java:8.0.32'
+    testImplementation 'com.h2database:h2:1.4.200'
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+    testCompileOnly 'org.projectlombok:lombok:1.18.34'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+
+//    compileOnly 'org.projectlombok:lombok:1.18.34'
+//    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+//    testCompileOnly 'org.projectlombok:lombok:1.18.34'
+//    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
 
 //    implementation 'org.springframework.boot:spring-boot-gradle-plugin:3.3.1'
 //    implementation 'org.springframework.boot:spring-boot-starter-web:3.3.1'

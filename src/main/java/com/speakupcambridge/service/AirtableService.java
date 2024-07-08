@@ -3,21 +3,23 @@ package com.speakupcambridge.service;
 import com.speakupcambridge.model.AirtableDuesPeriod;
 import com.speakupcambridge.model.AirtableMeeting;
 import com.speakupcambridge.model.AirtablePerson;
-import com.speakupcambridge.repository.ReadOnlyRepository;
+import com.speakupcambridge.repository.RemoteAirtableDuesPeriodRepository;
+import com.speakupcambridge.repository.RemoteAirtableMeetingRepository;
+import com.speakupcambridge.repository.RemoteAirtablePersonRepository;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
 public class AirtableService {
-  private final ReadOnlyRepository<AirtablePerson, String> remotePersonRepository;
-  private final ReadOnlyRepository<AirtableMeeting, String> remoteMeetingRepository;
-  private final ReadOnlyRepository<AirtableDuesPeriod, String> remoteDuesPeriodRepository;
+  private final RemoteAirtablePersonRepository remotePersonRepository;
+  private final RemoteAirtableMeetingRepository remoteMeetingRepository;
+  private final RemoteAirtableDuesPeriodRepository remoteDuesPeriodRepository;
 
   public AirtableService(
-      ReadOnlyRepository<AirtablePerson, String> remotePersonRepository,
-      ReadOnlyRepository<AirtableMeeting, String> remoteMeetingRepository,
-      ReadOnlyRepository<AirtableDuesPeriod, String> remoteDuesPeriodRepository) {
+      RemoteAirtablePersonRepository remotePersonRepository,
+      RemoteAirtableMeetingRepository remoteMeetingRepository,
+      RemoteAirtableDuesPeriodRepository remoteDuesPeriodRepository) {
     this.remotePersonRepository = remotePersonRepository;
     this.remoteMeetingRepository = remoteMeetingRepository;
     this.remoteDuesPeriodRepository = remoteDuesPeriodRepository;

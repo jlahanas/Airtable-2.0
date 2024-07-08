@@ -5,16 +5,16 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Map;
 import java.util.Objects;
+
+import com.speakupcambridge.util.RestUtils;
 
 @Service
 public class AirtableRestService {
+  public static String OFFSET_PARAM = "offset";
   private final String baseUrl;
   private final String bearerToken;
   private final String baseId;
@@ -35,65 +35,16 @@ public class AirtableRestService {
     this.httpClient = HttpClient.newHttpClient();
   }
 
-  public String fetchRecords(String tableName, String recordId) {
-    String uri = buildResourceUrl(tableName, recordId);
-    HttpRequest request;
-    HttpResponse<String> response;
-
-    try {
-      request =
-          HttpRequest.newBuilder()
-              .GET()
-              .uri(new URI(uri))
-              .header("Authorization", String.format("Bearer %s", this.bearerToken))
-              .build();
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(String.format("Invalid URI: '%s'", uri), e);
-    }
-
-    try {
-      response = this.httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-    } catch (IOException | InterruptedException e) {
-      throw new RuntimeException(e);
-    }
-
-    if (response.statusCode() == 404) {
-      // 404 is only returned when a record isn't found
-      // If a table is not found a 403 forbidden is returned
-      return null;
-    }
-
-    if (response.statusCode() != 200) {
-      String message =
-          Objects.nonNull(recordId)
-              ? String.format(
-                  "Request for record '%s' failed with status %d: %s",
-                  recordId, response.statusCode(), response.body())
-              : String.format(
-                  "Request for records from '%s' failed with status %d: %s",
-                  tableName, response.statusCode(), response.body());
-      throw new RuntimeException(message);
-    }
-
-    return response.body();
+  public String fetchRecord(String tableName, String recordId) {
+    return this.fetchRecordImpl(tableName, recordId, null);
   }
 
-  //  public String fetchRecordsOld(String tableName, String recordId) {
-  //    String url = buildResourceUrl(tableName, recordId);
-  //    HttpEntity<String> header = buildAuthHeader();
-  //    ResponseEntity<String> response =
-  //        this.restTemplate.exchange(url, HttpMethod.GET, header, String.class);
-  //
-  //    System.out.println("Request URL: " + url);
-  //    System.out.println("Request Headers: " + header.getHeaders());
-  //    System.out.println("Response Status: " + response.getStatusCode());
-  //    System.out.println("Response Body: " + response.getBody());
-  //
-  //    return response.getBody();
-  //  }
-
   public String fetchRecords(String tableName) {
-    return fetchRecords(tableName, null);
+    return this.fetchRecordImpl(tableName, null, null);
+  }
+
+  public String fetchRecords(String tableName, String offset) {
+    return this.fetchRecordImpl(tableName, null, offset);
   }
 
   private HttpEntity<String> buildAuthHeader() {
@@ -117,6 +68,33 @@ public class AirtableRestService {
       tableUrl = String.format("%s/%s", tableUrl, recordId);
     }
     return tableUrl;
+  }
+
+  private String fetchRecordImpl(String tableName, String recordId, String offset) {
+    String uri = buildResourceUrl(tableName, recordId);
+    Map<String, String> queryParams = Objects.nonNull(offset) ? Map.of(OFFSET_PARAM, offset) : null;
+    HttpResponse<String> response =
+        RestUtils.submitGetRequest(this.httpClient, uri, this.bearerToken, queryParams);
+
+    if (response.statusCode() == 404) {
+      // 404 is only returned when a record isn't found
+      // If a table is not found a 403 forbidden is returned
+      return null;
+    }
+
+    if (response.statusCode() != 200) {
+      String message =
+          Objects.nonNull(recordId)
+              ? String.format(
+                  "Request for record '%s' failed with status %d: %s",
+                  recordId, response.statusCode(), response.body())
+              : String.format(
+                  "Request for records from '%s' failed with status %d: %s",
+                  tableName, response.statusCode(), response.body());
+      throw new RuntimeException(message);
+    }
+
+    return response.body();
   }
 
   private static String formatUrlComponent(String urlComponent) {
