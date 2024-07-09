@@ -3,10 +3,7 @@ package com.speakupcambridge;
 import com.speakupcambridge.model.AirtableDuesPeriod;
 import com.speakupcambridge.model.AirtableMeeting;
 import com.speakupcambridge.model.AirtablePerson;
-import com.speakupcambridge.repository.LocalAirtablePersonJpaRepository;
-import com.speakupcambridge.repository.RemoteAirtableDuesPeriodRepository;
-import com.speakupcambridge.repository.RemoteAirtableMeetingRepository;
-import com.speakupcambridge.repository.RemoteAirtablePersonRepository;
+import com.speakupcambridge.repository.*;
 import com.speakupcambridge.service.AirtableRestService;
 import com.speakupcambridge.service.AirtableService;
 import com.speakupcambridge.component.JsonMapper;
@@ -36,26 +33,17 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
 public class AirtableServiceTest {
-  private static final String PERSON_TABLE_NAME = "Persons";
-  private static final String MEETING_TABLE_NAME = "Meetings";
-  private static final String DUES_TABLE_NAME = "Dues";
-
-  private static final String PERSON_JSON_FILE_PATH =
-      "src/test/resources/model/AirtablePerson.json";
-  private static final String MEETING_JSON_FILE_PATH =
-      "src/test/resources/model/AirtableMeeting.json";
-  private static final String DUES_JSON_FILE_PATH =
-      "src/test/resources/model/AirtableDuesPeriod.json";
   // This matches the ID in the JSON test files
   private static final String VALID_ID = "ValidId";
 
-  //  @Mock private AirtableRestService airtableRestService;
-  //  private JsonMapper jsonMapper;
   // TODO: Replace these with mocks, lol
   @Autowired private RemoteAirtablePersonRepository remoteAirtablePersonRepository;
   @Autowired private RemoteAirtableMeetingRepository remoteAirtableMeetingRepository;
   @Autowired private RemoteAirtableDuesPeriodRepository remoteAirtableDuesPeriodRepository;
   @Autowired private LocalAirtablePersonJpaRepository localAirtablePersonJpaRepository;
+  @Autowired private LocalAirtableMeetingJpaRepository localAirtableMeetingJpaRepository;
+  @Autowired private LocalAirtableDuesPeriodJpaRepository localAirtableDuesPeriodJpaRepository;
+  @Autowired private LocalPersonRepository localPersonRepository;
 
   private AirtableService airtableService;
 
@@ -63,18 +51,15 @@ public class AirtableServiceTest {
   void setUp() {
     MockitoAnnotations.openMocks(this);
 
-    //    this.jsonMapper = new JsonMapper();
-
     this.airtableService =
         new AirtableService(
             this.remoteAirtablePersonRepository,
             this.remoteAirtableMeetingRepository,
-            this.remoteAirtableDuesPeriodRepository);
-    //            PERSON_TABLE_NAME,
-    //            MEETING_TABLE_NAME,
-    //            DUES_TABLE_NAME,
-    //            airtableRestService,
-    //            jsonMapper);
+            this.remoteAirtableDuesPeriodRepository,
+            this.localAirtablePersonJpaRepository,
+            this.localAirtableMeetingJpaRepository,
+            this.localAirtableDuesPeriodJpaRepository,
+            this.localPersonRepository);
 
     //    setupRestCallMocks();
   }
@@ -131,6 +116,11 @@ public class AirtableServiceTest {
   void writesPersonsToDb() {
     List<AirtablePerson> records = this.airtableService.fetchPersons();
     localAirtablePersonJpaRepository.saveAll(records);
+  }
+
+  @Test
+  void generatePersonsTablesEnrichData() {
+    this.airtableService.generatePersonsTableFromRawData(true);
   }
 
   @Test

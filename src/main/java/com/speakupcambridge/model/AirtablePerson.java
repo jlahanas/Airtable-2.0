@@ -1,8 +1,10 @@
 package com.speakupcambridge.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,9 +18,19 @@ import lombok.Setter;
 public class AirtablePerson extends AirtableRecord {
   @Embedded private AirtablePersonFields fields;
 
+  @JsonCreator
+  public AirtablePerson(
+      @JsonProperty("id") String id,
+      @JsonProperty("createdTime") String createdTime,
+      @JsonProperty("fields") AirtablePersonFields fields) {
+    super(id, createdTime);
+    this.fields = fields;
+  }
+
   @JsonIgnoreProperties(ignoreUnknown = true)
   @Embeddable
   @NoArgsConstructor
+  @AllArgsConstructor
   @Getter
   @Setter
   public static class AirtablePersonFields {

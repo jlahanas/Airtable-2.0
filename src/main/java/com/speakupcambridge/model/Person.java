@@ -1,15 +1,68 @@
 package com.speakupcambridge.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
+import com.speakupcambridge.model.enums.ActiveStatus;
+import com.speakupcambridge.model.enums.PersonType;
+import com.speakupcambridge.model.enums.RoleType;
+import com.speakupcambridge.model.enums.SpeechType;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Table(name = "person")
 public class Person {
-  @Id private String name;
+  @Id @GeneratedValue private UUID id;
+
+  private String airtableId;
+
+  private String name;
   private String firstName;
   private String lastName;
 
-  private String type;
+  @Enumerated(EnumType.STRING)
+  private PersonType type;
+
+  @Enumerated(EnumType.STRING)
+  private ActiveStatus membershipStatus;
+
+  @Enumerated(EnumType.STRING)
+  private ActiveStatus attendanceStatus;
+
+  private String email;
+
+  private String address;
+
+  private Boolean reminderEmails;
+
+  private LocalDate lastAttendedDate;
+
+  private LocalDate lastRoleDate;
+
+  @Enumerated(EnumType.STRING)
+  private RoleType lastRole;
+
+  private LocalDate lastSpeechDate;
+
+  @Enumerated(EnumType.STRING)
+  private SpeechType lastSpeech;
+
+  private LocalDate duesLastPaid;
+
+  private String phone;
+
+  private LocalDateTime createdTime;
+
+  @ElementCollection private List<String> meetingIds;
+
+  @ElementCollection private List<String> roleMeetingIds;
+
+  @ElementCollection private List<String> speechMeetingIds;
 }

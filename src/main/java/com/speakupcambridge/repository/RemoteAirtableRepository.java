@@ -4,8 +4,8 @@ import com.speakupcambridge.exceptions.UnexpectedJsonFormatException;
 import com.speakupcambridge.model.AirtableRecord;
 import com.speakupcambridge.service.AirtableRestService;
 import com.speakupcambridge.component.JsonMapper;
+import lombok.Getter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -15,8 +15,8 @@ public abstract class RemoteAirtableRepository<T extends AirtableRecord>
 
   private final AirtableRestService airtableRestService;
   private final JsonMapper jsonMapper;
-  private final String tableName;
-  private final Class<T> entityType;
+  @Getter private final String tableName;
+  @Getter private final Class<T> entityType;
 
   public RemoteAirtableRepository(
       AirtableRestService airtableRestService,

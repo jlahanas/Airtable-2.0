@@ -19,8 +19,6 @@ public class AirtableRestService {
   private final String bearerToken;
   private final String baseId;
 
-  //  private final RestTemplate restTemplate;
-  //  private final RestClient restClient;
   private final HttpClient httpClient;
 
   public AirtableRestService(
@@ -31,7 +29,6 @@ public class AirtableRestService {
     this.bearerToken = bearerToken;
     this.baseId = baseId;
 
-    //    this.restTemplate = restTemplate;
     this.httpClient = HttpClient.newHttpClient();
   }
 
@@ -51,12 +48,6 @@ public class AirtableRestService {
     HttpHeaders headers = new HttpHeaders();
     headers.setBearerAuth(this.bearerToken);
     headers.set("Authorization", String.format("Bearer %s", this.bearerToken));
-    //    headers.set("User-Agent", "PostmanRuntime/7.39.0");
-    //    headers.set("Accept", "*/*");
-    //    headers.set("Connection", "keep-alive");
-    //    headers.set("Accept-Encoding", "gzip, deflate, br");
-    //    headers.set("Host", "api.airtable.com");
-    //    headers.set("Cache-Control", "no-cache");
 
     return new HttpEntity<>(headers);
   }
