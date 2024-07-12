@@ -24,7 +24,7 @@ public enum RoleType {
 
   @Override
   public String toString() {
-    return displayValue;
+    return this.displayValue;
   }
 
   public static RoleType fromString(String s) {

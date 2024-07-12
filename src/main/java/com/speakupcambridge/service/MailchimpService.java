@@ -1,108 +1,166 @@
 package com.speakupcambridge.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.speakupcambridge.exceptions.UnexpectedJsonFormatException;
 import com.speakupcambridge.model.MailchimpPerson;
-import org.springframework.http.HttpMethod;
+import com.speakupcambridge.model.MailchimpLocalPerson;
+import com.speakupcambridge.model.MailchimpRemotePerson;
+import com.speakupcambridge.model.Person;
+import com.speakupcambridge.model.enums.SubscriptionStatus;
+import com.speakupcambridge.model.mapper.OneToOneMapper;
+import com.speakupcambridge.model.mapper.PersonMapper;
+import com.speakupcambridge.repository.*;
+import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.logging.Logger;
 
+@Service
 public class MailchimpService {
-  private static final String MEMBERS_LIST_FIELD = "members";
+  private static final Logger LOGGER = Logger.getLogger(MailchimpService.class.getName());
+  private final RemoteMailchimpPersonRepository remoteMailchimpPersonRepository;
+  private final RemoteMailchimpListsRepository remoteMailchimpListsRepository;
+  private final LocalMailchimpPersonJpaRepository localMailchimpPersonJpaRepository;
+  private final RemoteMailchimpPersonJpaRepository remoteMailchimpPersonJpaRepository;
+  private final LocalPersonRepository localPersonRepository;
 
-  private final MailchimpRestService mailchimpRestService;
-
-  private final ObjectMapper mapper;
-
-  public MailchimpService(MailchimpRestService mailchimpRestService, ObjectMapper mapper) {
-    this.mailchimpRestService = mailchimpRestService;
-    this.mapper = mapper;
+  public MailchimpService(
+      RemoteMailchimpPersonRepository remoteMailchimpPersonRepository,
+      RemoteMailchimpListsRepository remoteMailchimpListsRepository,
+      LocalMailchimpPersonJpaRepository localMailchimpPersonJpaRepository,
+      RemoteMailchimpPersonJpaRepository remoteMailchimpPersonJpaRepository,
+      LocalPersonRepository localPersonRepository) {
+    this.remoteMailchimpPersonRepository = remoteMailchimpPersonRepository;
+    this.remoteMailchimpListsRepository = remoteMailchimpListsRepository;
+    this.localMailchimpPersonJpaRepository = localMailchimpPersonJpaRepository;
+    this.remoteMailchimpPersonJpaRepository = remoteMailchimpPersonJpaRepository;
+    this.localPersonRepository = localPersonRepository;
   }
 
   public List<MailchimpPerson> fetchPersons(String listId) {
-    // TODO: We may want to cache the list member count to avoid making two API calls when
-    // mailchimpRestService.fetchLists() was already called
-    int memberCount = getListMemberCount(listId);
-    JsonNode root;
-
-    if (memberCount < 0) {
-      throw new UnexpectedJsonFormatException(
-          String.format(
-              "Unable to find member count of list '%s'. Either the list was not found or the JSON response schema has changed.",
-              listId));
-    }
-
-    // One call's JSON is sufficient if the memberCount doesn't exceed the maximum
-    if (memberCount <= MailchimpRestService.MAX_ENTITIES_PER_REQUEST) {
-      String resp = this.mailchimpRestService.fetchMembers(listId);
-      return this.mapJsonMembersListToMailchimpPersonList(resp);
-    }
-
-    // Otherwise, concatenate multiple lists
-    List<MailchimpPerson> entityList = new ArrayList<>();
-    for (int offset = 0;
-        offset < memberCount;
-        offset += MailchimpRestService.MAX_ENTITIES_PER_REQUEST) {
-      String resp =
-          this.mailchimpRestService.fetchMembers(
-              listId, MailchimpRestService.MAX_ENTITIES_PER_REQUEST, offset);
-      entityList.addAll(this.mapJsonMembersListToMailchimpPersonList(resp));
-    }
-    return entityList;
+    return this.remoteMailchimpPersonRepository.findAll(listId);
   }
 
-  private int getListMemberCount(String listId) {
-    JsonNode resp, lists;
+  public List<MailchimpPerson> fetchPersons() {
+    return this.remoteMailchimpPersonRepository.findAll();
+  }
 
-    // Get the lists from Mailchimp and parse the JSON for the number of members in the
-    // list with the given ID
-    try {
-      resp = this.mapper.readTree(this.mailchimpRestService.fetchLists());
-    } catch (JsonProcessingException e) {
-      throw new UnexpectedJsonFormatException(
-          "Unexpected or malformed response to lists GET request from Mailchimp", e);
-    }
-    lists = resp.get("lists");
-    if (lists == null || !lists.isArray()) {
-      throw new UnexpectedJsonFormatException("Missing or empty 'lists' list in GET response");
+  public List<String> fetchListIds() {
+    return this.remoteMailchimpListsRepository.findAllListIds();
+  }
+
+  public void syncDatabase() {
+    List<MailchimpPerson> personList = this.fetchPersons();
+    List<MailchimpRemotePerson> remotePersonList =
+        personList.stream().map(OneToOneMapper.INSTANCE::toMailchimpRemotePerson).toList();
+    this.remoteMailchimpPersonJpaRepository.saveAll(remotePersonList);
+  }
+
+  public void generateTableFromRawData(boolean syncData) {
+    if (syncData) {
+      syncDatabase();
     }
 
-    for (JsonNode list : lists) {
-      if (list.get("id").toString().equals(listId)) {
-        return list.get("stats").get("member_count").asInt();
+    // Copy remote mailchimp table to outgoing table for compare/overwrite/update
+    this.copyRemoteToLocal();
+
+    // Loop through persons list from airtable and attempt to find each in the
+    // existing (source) Mailchimp table:
+    // - If it exists, update it.
+    // - Otherwise, if subscribed and with a valid email, add it.
+    List<Person> personList = this.localPersonRepository.findAll();
+
+    for (Person person : this.localPersonRepository.findAll()) {
+      Optional<String> oEmail = Optional.ofNullable(person.getEmail());
+      if (oEmail.isEmpty()) {
+        MailchimpService.LOGGER.info(
+            String.format(
+                "In Mailchimp update: No email address found for '%s'", person.getName()));
+        if (person.getReminderEmails()) {
+          MailchimpService.LOGGER.warning(
+              String.format(
+                  "In Mailchimp update: Cannot subscribe '%s' without a registered email address",
+                  person.getName()));
+        }
+        continue;
+      }
+      String email = oEmail.get();
+
+      // Attempt to find by email
+      Optional<MailchimpLocalPerson> match = this.localMailchimpPersonJpaRepository.findById(email);
+      if (match.isPresent()) {
+        // Update --
+        boolean update = false;
+
+        // Check subscription status against Mailchimp's --
+        SubscriptionStatus matchStatus =
+            SubscriptionStatus.fromString(
+                Objects.requireNonNull(
+                    match.get().getStatus(),
+                    String.format(
+                        "Mailchimp member '%s' has no subscription status",
+                        match.get().getFullName())));
+
+        switch (matchStatus) {
+          case SUBSCRIBED -> {
+            // If we have unsubscribed them, simply update Mailchimp to reflect this
+            // The record will be updated; notify and continue
+            if (!matchStatus.equals(SubscriptionStatus.fromBool(person.getReminderEmails()))) {
+              MailchimpService.LOGGER.info(
+                  String.format(
+                      "Unsubscribing member '%s' from receiving emails.", person.getName()));
+            }
+            update = true;
+          }
+          case UNSUBSCRIBED -> {
+            // Inform that the person has unsubscribed from the mailing service
+            MailchimpService.LOGGER.info(
+                String.format("'%s' has unsubscribed from emails.", person.getName()));
+            // Remote is unsubscribed, but we have them flagged for emails. Forbidden! Issue severe
+            // warning that master DB must be updated to reflect. Do not update.
+            if (person.getReminderEmails()) {
+              MailchimpService.LOGGER.severe(
+                  String.format(
+                      "'%s' is marked to receive emails but has unsubscribed."
+                          + " Database should be updated to reflect that they no longer wish to receive emails.",
+                      person.getName()));
+            }
+          }
+          case CLEANED -> {
+            // Remote email is not valid. Issue warning that the email on file is incorrect or has
+            // changed.
+            MailchimpService.LOGGER.warning(
+                String.format(
+                    "Registered email '%s' for '%s' is incorrect or no longer in service.",
+                    person.getEmail(), person.getName()));
+          }
+        }
+
+        if (update) {
+          match.get().overwriteWith(PersonMapper.toMailchimpPerson(person), false);
+          //
+          // this.localMailchimpPersonJpaRepository.save(PersonMapper.toMailchimpLocalPerson(person));
+          //
+          // this.localMailchimpPersonJpaRepository.save(PersonMapper.overwriteMailchimpPerson(person))
+        }
+      } else {
+        // Match not found --
+        // Add the person if they're subscribed
+        if (person.getReminderEmails()) {
+          MailchimpLocalPerson newPerson =
+              new MailchimpLocalPerson(PersonMapper.toMailchimpPerson(person));
+          this.localMailchimpPersonJpaRepository.save(newPerson);
+        }
       }
     }
-    return -1;
   }
 
-  private List<MailchimpPerson> mapJsonMembersListToMailchimpPersonList(String json) {
-    List<MailchimpPerson> entityList = new ArrayList<>();
-    JsonNode root;
+  private void copyRemoteToLocal() {
+    List<MailchimpRemotePerson> remotePersonList =
+        this.remoteMailchimpPersonJpaRepository.findAll();
+    List<MailchimpLocalPerson> localPersonList =
+        remotePersonList.stream().map(OneToOneMapper.INSTANCE::toMailchimpLocalPerson).toList();
 
-    try {
-      root = this.mapper.readTree(json);
-    } catch (JsonProcessingException e) {
-      throw new UnexpectedJsonFormatException(
-          String.format(
-              "Unexpected or malformed response to '%s' list GET request from Mailchimp",
-              MEMBERS_LIST_FIELD),
-          e);
-    }
-
-    JsonNode records = root.get(MEMBERS_LIST_FIELD);
-    if (records == null || !records.isArray()) {
-      throw new UnexpectedJsonFormatException(
-          String.format(
-              "Missing or empty '%s' list in GET response from Airtable", MEMBERS_LIST_FIELD));
-    }
-
-    for (JsonNode record : records) {
-      entityList.add(mapper.convertValue(record, MailchimpPerson.class));
-    }
-    return entityList;
+    this.localMailchimpPersonJpaRepository.saveAll(localPersonList);
   }
 }

@@ -3,7 +3,7 @@ package com.speakupcambridge.repository;
 import com.speakupcambridge.exceptions.UnexpectedJsonFormatException;
 import com.speakupcambridge.model.AirtableRecord;
 import com.speakupcambridge.service.AirtableRestService;
-import com.speakupcambridge.component.JsonMapper;
+import com.speakupcambridge.component.AirtableJsonMapper;
 import lombok.Getter;
 
 import java.util.List;
@@ -14,13 +14,13 @@ public abstract class RemoteAirtableRepository<T extends AirtableRecord>
     implements ReadOnlyRepository<T, String> {
 
   private final AirtableRestService airtableRestService;
-  private final JsonMapper jsonMapper;
+  private final AirtableJsonMapper jsonMapper;
   @Getter private final String tableName;
   @Getter private final Class<T> entityType;
 
   public RemoteAirtableRepository(
       AirtableRestService airtableRestService,
-      JsonMapper jsonMapper,
+      AirtableJsonMapper jsonMapper,
       String tableName,
       Class<T> entityType) {
     this.airtableRestService = airtableRestService;

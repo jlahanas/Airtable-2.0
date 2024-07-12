@@ -15,7 +15,7 @@ public enum SpeechType {
 
   @Override
   public String toString() {
-    return displayValue;
+    return this.displayValue;
   }
 
   public static SpeechType fromString(String s) {

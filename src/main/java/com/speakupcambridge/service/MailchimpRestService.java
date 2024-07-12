@@ -15,7 +15,7 @@ import java.net.http.HttpResponse;
 
 @Service
 public class MailchimpRestService {
-  public static int MAX_ENTITIES_PER_REQUEST = 1000;
+  public static final int MAX_ENTITIES_PER_REQUEST = 1000;
   private final String baseUrl;
   private final String serverId;
   private final String bearerToken;

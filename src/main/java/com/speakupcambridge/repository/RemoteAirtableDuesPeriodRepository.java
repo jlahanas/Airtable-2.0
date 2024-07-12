@@ -3,7 +3,7 @@ package com.speakupcambridge.repository;
 import com.speakupcambridge.config.AirtableConfig;
 import com.speakupcambridge.model.AirtableDuesPeriod;
 import com.speakupcambridge.service.AirtableRestService;
-import com.speakupcambridge.component.JsonMapper;
+import com.speakupcambridge.component.AirtableJsonMapper;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -12,8 +12,12 @@ public class RemoteAirtableDuesPeriodRepository
 
   public RemoteAirtableDuesPeriodRepository(
       AirtableRestService airtableRestService,
-      JsonMapper jsonMapper,
+      AirtableJsonMapper airtableJsonMapper,
       AirtableConfig airtableConfig) {
-    super(airtableRestService, jsonMapper, airtableConfig.meetingsTable, AirtableDuesPeriod.class);
+    super(
+        airtableRestService,
+        airtableJsonMapper,
+        airtableConfig.meetingsTable,
+        AirtableDuesPeriod.class);
   }
 }

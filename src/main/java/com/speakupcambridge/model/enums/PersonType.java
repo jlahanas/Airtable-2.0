@@ -15,7 +15,7 @@ public enum PersonType {
 
   @Override
   public String toString() {
-    return displayValue;
+    return this.displayValue;
   }
 
   public static PersonType fromString(String s) {

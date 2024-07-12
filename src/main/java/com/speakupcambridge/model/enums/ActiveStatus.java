@@ -14,7 +14,7 @@ public enum ActiveStatus {
 
   @Override
   public String toString() {
-    return displayValue;
+    return this.displayValue;
   }
 
   public static ActiveStatus fromString(String s) {

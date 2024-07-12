@@ -4,16 +4,12 @@ import com.speakupcambridge.model.AirtableDuesPeriod;
 import com.speakupcambridge.model.AirtableMeeting;
 import com.speakupcambridge.model.AirtablePerson;
 import com.speakupcambridge.repository.*;
-import com.speakupcambridge.service.AirtableRestService;
 import com.speakupcambridge.service.AirtableService;
-import com.speakupcambridge.component.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -25,9 +21,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest

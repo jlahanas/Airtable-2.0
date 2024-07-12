@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Objects;
 
 @Component
-public class JsonMapper {
+public class AirtableJsonMapper {
   public static String RECORD_LIST_FIELD = "records";
   public static String OFFSET_FIELD = "offset";
   private final ObjectMapper mapper;
 
-  public JsonMapper() {
+  public AirtableJsonMapper() {
     this.mapper = new ObjectMapper();
   }
 
@@ -30,7 +30,7 @@ public class JsonMapper {
 
     try {
       JsonNode root = this.mapper.readTree(json);
-      return mapper.convertValue(root, toValueType);
+      return this.mapper.convertValue(root, toValueType);
     } catch (JsonProcessingException e) {
       throw new UnexpectedJsonFormatException(e);
     }
@@ -57,7 +57,7 @@ public class JsonMapper {
     }
 
     for (JsonNode record : records) {
-      entityList.add(mapper.convertValue(record, toValueType));
+      entityList.add(this.mapper.convertValue(record, toValueType));
     }
     return entityList;
   }
