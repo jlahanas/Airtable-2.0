@@ -3,6 +3,7 @@ plugins {
     id "org.springframework.boot" version "3.3.1"
     id "io.spring.dependency-management" version "1.1.5"
     id "io.freefair.lombok" version "8.6"
+    id "co.uzzu.dotenv.gradle" version "4.0.0"
 }
 
 group = 'com.speakupcambridge'
@@ -13,45 +14,36 @@ repositories {
 }
 
 dependencies {
+    // Junit
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
-//    implementation 'org.springframework.boot:spring-boot-gradle-plugin:2.3.4.RELEASE'
-
+    // Spring
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // Mockito
     testImplementation 'org.mockito:mockito-core:3.11.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // MySQL
     runtimeOnly 'mysql:mysql-connector-java:8.0.32'
+    // H2 (for testing)
     testImplementation 'com.h2database:h2:1.4.200'
+    // Lombok boilerplate gen
     compileOnly 'org.projectlombok:lombok:1.18.34'
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
     testCompileOnly 'org.projectlombok:lombok:1.18.34'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+    // Mapstruct data structure mapping
     implementation 'org.mapstruct:mapstruct:1.5.2.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.2.Final'
-    implementation 'commons-beanutils:commons-beanutils:1.9.4'
-
-//    compileOnly 'org.projectlombok:lombok:1.18.34'
-//    annotationProcessor 'org.projectlombok:lombok:1.18.34'
-//    testCompileOnly 'org.projectlombok:lombok:1.18.34'
-//    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
-
-//    implementation 'org.springframework.boot:spring-boot-gradle-plugin:3.3.1'
-//    implementation 'org.springframework.boot:spring-boot-starter-web:3.3.1'
-//    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.3.1'
-////    runtimeOnly 'com.h2database:h2'
-////    developmentOnly 'org.springframework.boot:spring-boot-devtools:3.3.1'
-////    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // Dotenv for loading env
+    implementation 'io.github.cdimascio:java-dotenv:5.2.2'
 }
 
-//java {
-//    toolchain {
-//        languageVersion = JavaLanguageVersion.of(17)
-//    }
-//}
-
 test {
+    // Pass system properties and/or environment to tests
+//    systemProperties System.getProperties()
+    systemProperties env.allVariables()
     useJUnitPlatform()
 }
