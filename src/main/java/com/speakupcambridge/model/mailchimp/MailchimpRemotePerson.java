@@ -1,4 +1,4 @@
-package com.speakupcambridge.model;
+package com.speakupcambridge.model.mailchimp;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

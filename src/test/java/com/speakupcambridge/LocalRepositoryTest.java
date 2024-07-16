@@ -1,8 +1,8 @@
 package com.speakupcambridge;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.speakupcambridge.model.AirtablePerson;
-import com.speakupcambridge.repository.LocalAirtableJpaRepository;
+import com.speakupcambridge.model.airtable.AirtablePerson;
+import com.speakupcambridge.repository.airtable.LocalAirtableJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

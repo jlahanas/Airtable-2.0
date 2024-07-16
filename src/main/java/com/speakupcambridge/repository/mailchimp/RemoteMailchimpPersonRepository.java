@@ -1,8 +1,8 @@
-package com.speakupcambridge.repository;
+package com.speakupcambridge.repository.mailchimp;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.speakupcambridge.component.MailchimpJsonMapper;
-import com.speakupcambridge.model.MailchimpPerson;
+import com.speakupcambridge.model.mailchimp.MailchimpPerson;
 import com.speakupcambridge.service.MailchimpRestService;
 import org.springframework.stereotype.Repository;
 

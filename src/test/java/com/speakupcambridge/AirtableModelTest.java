@@ -3,7 +3,7 @@ package com.speakupcambridge;
 import testUtils.FileUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.speakupcambridge.model.AirtablePerson;
+import com.speakupcambridge.model.airtable.AirtablePerson;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

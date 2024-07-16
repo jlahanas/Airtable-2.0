@@ -1,4 +1,4 @@
-package com.speakupcambridge.repository;
+package com.speakupcambridge.repository.mailchimp;
 
 import com.speakupcambridge.component.MailchimpJsonMapper;
 import com.speakupcambridge.service.MailchimpRestService;

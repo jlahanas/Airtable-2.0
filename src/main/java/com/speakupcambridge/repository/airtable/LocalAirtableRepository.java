@@ -1,6 +1,6 @@
 // package com.speakupcambridge.repository;
 //
-// import com.speakupcambridge.model.AirtableRecord;
+// import com.speakupcambridge.model.airtable.AirtableRecord;
 // import org.springframework.data.repository.Repository;
 //
 // @org.springframework.stereotype.Repository

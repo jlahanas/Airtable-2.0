@@ -1,7 +1,8 @@
-package com.speakupcambridge.repository;
+package com.speakupcambridge.repository.airtable;
 
 import com.speakupcambridge.exceptions.UnexpectedJsonFormatException;
-import com.speakupcambridge.model.AirtableRecord;
+import com.speakupcambridge.model.airtable.AirtableRecord;
+import com.speakupcambridge.repository.ReadOnlyRepository;
 import com.speakupcambridge.service.AirtableRestService;
 import com.speakupcambridge.component.AirtableJsonMapper;
 import lombok.Getter;

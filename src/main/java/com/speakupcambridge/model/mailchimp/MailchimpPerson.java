@@ -1,4 +1,4 @@
-package com.speakupcambridge.model;
+package com.speakupcambridge.model.mailchimp;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

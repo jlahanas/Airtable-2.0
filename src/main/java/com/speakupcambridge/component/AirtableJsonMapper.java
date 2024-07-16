@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.speakupcambridge.exceptions.UnexpectedJsonFormatException;
-import com.speakupcambridge.model.AirtableRecord;
+import com.speakupcambridge.model.airtable.AirtableRecord;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 

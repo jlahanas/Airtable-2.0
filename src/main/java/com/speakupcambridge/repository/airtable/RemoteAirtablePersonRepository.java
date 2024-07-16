@@ -1,7 +1,7 @@
-package com.speakupcambridge.repository;
+package com.speakupcambridge.repository.airtable;
 
 import com.speakupcambridge.config.AirtableConfig;
-import com.speakupcambridge.model.AirtablePerson;
+import com.speakupcambridge.model.airtable.AirtablePerson;
 import com.speakupcambridge.service.AirtableRestService;
 import com.speakupcambridge.component.AirtableJsonMapper;
 import org.springframework.stereotype.Repository;

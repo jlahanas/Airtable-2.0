@@ -1,8 +1,7 @@
 package com.speakupcambridge.model.mapper;
 
-import com.speakupcambridge.model.AirtablePerson;
-import com.speakupcambridge.model.MailchimpPerson;
-import com.speakupcambridge.model.MailchimpLocalPerson;
+import com.speakupcambridge.model.airtable.AirtablePerson;
+import com.speakupcambridge.model.mailchimp.MailchimpPerson;
 import com.speakupcambridge.model.Person;
 import com.speakupcambridge.model.enums.ActiveStatus;
 import com.speakupcambridge.model.enums.NullableBoolString;
@@ -12,7 +11,6 @@ import com.speakupcambridge.model.enums.SubscriptionStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
 import java.util.Optional;
 
 public class PersonMapper {

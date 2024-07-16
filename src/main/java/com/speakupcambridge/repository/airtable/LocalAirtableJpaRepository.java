@@ -1,6 +1,6 @@
-package com.speakupcambridge.repository;
+package com.speakupcambridge.repository.airtable;
 
-import com.speakupcambridge.model.AirtableRecord;
+import com.speakupcambridge.model.airtable.AirtableRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 

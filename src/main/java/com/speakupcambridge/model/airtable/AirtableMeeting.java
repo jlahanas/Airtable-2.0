@@ -1,4 +1,4 @@
-package com.speakupcambridge.model;
+package com.speakupcambridge.model.airtable;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -137,7 +137,6 @@ public class AirtableMeeting extends AirtableRecord {
   private void resolveAllSpeechGivers() {
     this.allSpeechGivers =
         Stream.of(
-                this.fields.toastmasterPersonIds,
                 this.fields.rantPersonIds,
                 this.fields.speechPersonIds,
                 this.fields.tableTopicsPersonIds)

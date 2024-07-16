@@ -1,4 +1,4 @@
-package com.speakupcambridge.model;
+package com.speakupcambridge.model.airtable;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

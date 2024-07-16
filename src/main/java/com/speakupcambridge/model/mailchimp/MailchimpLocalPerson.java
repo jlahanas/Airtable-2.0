@@ -1,4 +1,4 @@
-package com.speakupcambridge.model;
+package com.speakupcambridge.model.mailchimp;
 
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;

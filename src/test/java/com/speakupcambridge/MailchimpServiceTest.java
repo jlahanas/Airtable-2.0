@@ -8,6 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.List;
+
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
@@ -16,6 +18,6 @@ public class MailchimpServiceTest {
 
   @Test
   void generateTableFromRawData_generatesTable() {
-    this.mailchimpService.generateTableFromRawData(true);
+    this.mailchimpService.generateUpdatedLocalTableFromPersonsList(List.of());
   }
 }

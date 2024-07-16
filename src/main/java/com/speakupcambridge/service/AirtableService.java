@@ -1,8 +1,11 @@
 package com.speakupcambridge.service;
 
 import com.speakupcambridge.model.*;
+import com.speakupcambridge.model.airtable.AirtableDuesPeriod;
+import com.speakupcambridge.model.airtable.AirtableMeeting;
+import com.speakupcambridge.model.airtable.AirtablePerson;
 import com.speakupcambridge.model.mapper.PersonMapper;
-import com.speakupcambridge.repository.*;
+import com.speakupcambridge.repository.airtable.*;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +22,6 @@ public class AirtableService {
   private final LocalAirtablePersonJpaRepository localRawPersonRepository;
   private final LocalAirtableMeetingJpaRepository localRawMeetingRepository;
   private final LocalAirtableDuesPeriodJpaRepository localRawDuesPeriodRepository;
-  private final LocalPersonRepository localPersonRepository;
 
   //  // TODO: Using the generic repositories List<List> runs into issues when trying to
   //  // select one of the correct type since it involves down casting.  Might not be possible
@@ -33,8 +35,7 @@ public class AirtableService {
       RemoteAirtableDuesPeriodRepository remoteDuesPeriodRepository,
       LocalAirtablePersonJpaRepository localRawPersonRepository,
       LocalAirtableMeetingJpaRepository localRawMeetingRepository,
-      LocalAirtableDuesPeriodJpaRepository localRawDuesPeriodRepository,
-      LocalPersonRepository localPersonRepository) {
+      LocalAirtableDuesPeriodJpaRepository localRawDuesPeriodRepository) {
     //    this.repositories = null;
     this.remotePersonRepository = remotePersonRepository;
     this.remoteMeetingRepository = remoteMeetingRepository;
@@ -42,7 +43,6 @@ public class AirtableService {
     this.localRawPersonRepository = localRawPersonRepository;
     this.localRawMeetingRepository = localRawMeetingRepository;
     this.localRawDuesPeriodRepository = localRawDuesPeriodRepository;
-    this.localPersonRepository = localPersonRepository;
   }
 
   //  public List<List<AirtableRecord>> fetchAll() {
@@ -52,6 +52,12 @@ public class AirtableService {
   //    }
   //    return results;
   //  }
+
+  public void clearDatabase() {
+    this.localRawPersonRepository.deleteAll();
+    this.localRawMeetingRepository.deleteAll();
+    this.localRawDuesPeriodRepository.deleteAll();
+  }
 
   public void syncDatabase() {
     List<AirtablePerson> personList = this.fetchPersons();
@@ -67,36 +73,18 @@ public class AirtableService {
     duesPeriodList.clear();
   }
 
-  public void generatePersonsTableFromRawData() {
-    this.generatePersonsTableFromRawData(false);
-  }
-
-  public void generatePersonsTableFromRawData(boolean syncData) {
-    if (syncData) {
-      this.syncDatabase();
-    }
-
-    for (AirtablePerson airtablePerson : localRawPersonRepository.findAll()) {
-      // One-to-one Map
-      Person person = PersonMapper.toPerson(airtablePerson);
-
-      // Enrich with the meeting data
-      person.setMeetingIds(
-          localRawMeetingRepository.findByAllAttendeesContaining(person.getAirtableId()).stream()
-              .map(AirtableMeeting::getId)
-              .collect(Collectors.toList()));
-      person.setRoleMeetingIds(
-          localRawMeetingRepository.findByAllRoleTakersContaining(person.getAirtableId()).stream()
-              .map(AirtableMeeting::getId)
-              .collect(Collectors.toList()));
-      person.setSpeechMeetingIds(
-          localRawMeetingRepository.findByAllSpeechGiversContaining(person.getAirtableId()).stream()
-              .map(AirtableMeeting::getId)
-              .collect(Collectors.toList()));
-
-      // Write to database
-      localPersonRepository.save(person);
-    }
+  public List<Person> generatePersonsList() {
+    return localRawPersonRepository.findAll().stream()
+        .map(PersonMapper::toPerson)
+        .peek(person -> person.setMeetingIds(findAllMeetingsWith(person.getAirtableId())))
+        .peek(
+            person ->
+                person.setRoleMeetingIds(findAllMeetingsWherePersonHasRole(person.getAirtableId())))
+        .peek(
+            person ->
+                person.setSpeechMeetingIds(
+                    findAllMeetingsWherePersonHasSpeech(person.getAirtableId())))
+        .toList();
   }
 
   public AirtablePerson fetchPerson(@NonNull String personId) {
@@ -121,6 +109,24 @@ public class AirtableService {
 
   public List<AirtableDuesPeriod> fetchDuesPeriods() {
     return this.remoteDuesPeriodRepository.findAll();
+  }
+
+  public List<String> findAllMeetingsWith(String personAirtableId) {
+    return localRawMeetingRepository.findByAllAttendeesContaining(personAirtableId).stream()
+        .map(AirtableMeeting::getId)
+        .collect(Collectors.toList());
+  }
+
+  public List<String> findAllMeetingsWherePersonHasRole(String personAirtableId) {
+    return localRawMeetingRepository.findByAllRoleTakersContaining(personAirtableId).stream()
+        .map(AirtableMeeting::getId)
+        .collect(Collectors.toList());
+  }
+
+  public List<String> findAllMeetingsWherePersonHasSpeech(String personAirtableId) {
+    return localRawMeetingRepository.findByAllSpeechGiversContaining(personAirtableId).stream()
+        .map(AirtableMeeting::getId)
+        .collect(Collectors.toList());
   }
 
   //  public void sync() {

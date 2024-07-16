@@ -1,6 +1,6 @@
-package com.speakupcambridge.repository;
+package com.speakupcambridge.repository.airtable;
 
-import com.speakupcambridge.model.AirtablePerson;
+import com.speakupcambridge.model.airtable.AirtablePerson;
 
 public interface LocalAirtablePersonJpaRepository
     extends LocalAirtableJpaRepository<AirtablePerson> {}

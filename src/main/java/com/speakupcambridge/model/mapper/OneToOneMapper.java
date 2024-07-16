@@ -1,8 +1,8 @@
 package com.speakupcambridge.model.mapper;
 
-import com.speakupcambridge.model.MailchimpLocalPerson;
-import com.speakupcambridge.model.MailchimpPerson;
-import com.speakupcambridge.model.MailchimpRemotePerson;
+import com.speakupcambridge.model.mailchimp.MailchimpLocalPerson;
+import com.speakupcambridge.model.mailchimp.MailchimpPerson;
+import com.speakupcambridge.model.mailchimp.MailchimpRemotePerson;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

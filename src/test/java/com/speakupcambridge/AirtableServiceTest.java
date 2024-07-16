@@ -1,15 +1,17 @@
 package com.speakupcambridge;
 
-import com.speakupcambridge.model.AirtableDuesPeriod;
-import com.speakupcambridge.model.AirtableMeeting;
-import com.speakupcambridge.model.AirtablePerson;
-import com.speakupcambridge.repository.*;
+import com.speakupcambridge.component.AirtableJsonMapper;
+import com.speakupcambridge.model.Person;
+import com.speakupcambridge.model.airtable.AirtableDuesPeriod;
+import com.speakupcambridge.model.airtable.AirtableMeeting;
+import com.speakupcambridge.model.airtable.AirtablePerson;
+import com.speakupcambridge.repository.airtable.*;
 import com.speakupcambridge.service.AirtableService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -21,23 +23,25 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
 public class AirtableServiceTest {
   // This matches the ID in the JSON test files
-  private static final String VALID_ID = "ValidId";
+  private static final String VALID_ID = "validId";
+  private static final String PERSON_JSON_FILE_PATH =
+      "src/test/resources/model/AirtablePerson.json";
 
-  // TODO: Replace these with mocks, lol
-  @Autowired private RemoteAirtablePersonRepository remoteAirtablePersonRepository;
-  @Autowired private RemoteAirtableMeetingRepository remoteAirtableMeetingRepository;
-  @Autowired private RemoteAirtableDuesPeriodRepository remoteAirtableDuesPeriodRepository;
-  @Autowired private LocalAirtablePersonJpaRepository localAirtablePersonJpaRepository;
-  @Autowired private LocalAirtableMeetingJpaRepository localAirtableMeetingJpaRepository;
-  @Autowired private LocalAirtableDuesPeriodJpaRepository localAirtableDuesPeriodJpaRepository;
-  @Autowired private LocalPersonRepository localPersonRepository;
+  @Mock private RemoteAirtablePersonRepository remoteAirtablePersonRepository;
+  @Mock private RemoteAirtableMeetingRepository remoteAirtableMeetingRepository;
+  @Mock private RemoteAirtableDuesPeriodRepository remoteAirtableDuesPeriodRepository;
+  @Mock private LocalAirtablePersonJpaRepository localAirtablePersonJpaRepository;
+  @Mock private LocalAirtableMeetingJpaRepository localAirtableMeetingJpaRepository;
+  @Mock private LocalAirtableDuesPeriodJpaRepository localAirtableDuesPeriodJpaRepository;
+  private AirtableJsonMapper airtableJsonMapper;
 
   private AirtableService airtableService;
 
@@ -52,10 +56,8 @@ public class AirtableServiceTest {
             this.remoteAirtableDuesPeriodRepository,
             this.localAirtablePersonJpaRepository,
             this.localAirtableMeetingJpaRepository,
-            this.localAirtableDuesPeriodJpaRepository,
-            this.localPersonRepository);
-
-    //    setupRestCallMocks();
+            this.localAirtableDuesPeriodJpaRepository);
+    this.airtableJsonMapper = new AirtableJsonMapper();
   }
 
   //  void setupRestCallMocks() {
@@ -107,14 +109,71 @@ public class AirtableServiceTest {
   //  }
 
   @Test
-  void writesPersonsToDb() {
-    List<AirtablePerson> records = this.airtableService.fetchPersons();
-    localAirtablePersonJpaRepository.saveAll(records);
+  void syncDatabase_fetchesAndWrites() {
+    // GIVEN/WHEN the service syncs the database
+    this.airtableService.syncDatabase();
+
+    // THEN the remotes are fetched from and the locals are written to
+    verify(this.remoteAirtablePersonRepository, times(1)).findAll();
+    verify(this.remoteAirtableMeetingRepository, times(1)).findAll();
+    verify(this.remoteAirtableDuesPeriodRepository, times(1)).findAll();
+    verify(this.localAirtablePersonJpaRepository, times(1)).saveAll(anyIterable());
+    verify(this.localAirtableMeetingJpaRepository, times(1)).saveAll(anyIterable());
+    verify(this.localAirtableDuesPeriodJpaRepository, times(1)).saveAll(anyIterable());
   }
 
   @Test
-  void generatePersonsTablesEnrichData() {
-    this.airtableService.generatePersonsTableFromRawData(true);
+  void generatePersonsList_setsMeetingIds() {
+    // GIVEN a local AirtablePerson repository with a single person
+    String personJson = readJsonFile(PERSON_JSON_FILE_PATH);
+
+    List<AirtablePerson> airtablePersonList =
+        this.airtableJsonMapper.mapList(arrayWrapJsonRecord(personJson), AirtablePerson.class);
+    when(this.localAirtablePersonJpaRepository.findAll()).thenReturn(airtablePersonList);
+    // ...and a mock meeting repository setup with three "meetings", with the person in
+    // a role of each type, respectively:
+    List<AirtableMeeting> airtableMeetingAttendeeList =
+        this.airtableJsonMapper.mapList(
+            arrayWrapJsonRecord(
+                generateMeetingJsonWithSinglePersonRole(
+                    "meeting0", "Attended", airtablePersonList.get(0).getId())),
+            AirtableMeeting.class);
+    when(this.localAirtableMeetingJpaRepository.findByAllAttendeesContaining(
+            airtablePersonList.get(0).getId()))
+        .thenReturn(airtableMeetingAttendeeList);
+    List<AirtableMeeting> airtableMeetingRoleTakerList =
+        this.airtableJsonMapper.mapList(
+            arrayWrapJsonRecord(
+                generateMeetingJsonWithSinglePersonRole(
+                    "meeting1", "Toastmaster", airtablePersonList.get(0).getId())),
+            AirtableMeeting.class);
+    when(this.localAirtableMeetingJpaRepository.findByAllRoleTakersContaining(
+            airtablePersonList.get(0).getId()))
+        .thenReturn(airtableMeetingRoleTakerList);
+    List<AirtableMeeting> airtableMeetingSpeechGiverList =
+        this.airtableJsonMapper.mapList(
+            arrayWrapJsonRecord(
+                generateMeetingJsonWithSinglePersonRole(
+                    "meeting2", "Speech", airtablePersonList.get(0).getId())),
+            AirtableMeeting.class);
+    when(this.localAirtableMeetingJpaRepository.findByAllSpeechGiversContaining(
+            airtablePersonList.get(0).getId()))
+        .thenReturn(airtableMeetingSpeechGiverList);
+
+    // WHEN the service generates a person list
+    List<Person> personList = this.airtableService.generatePersonsList();
+
+    // THEN the person list has a person record
+    assert personList.size() == 1;
+    // ...and the person's list of attended meeting IDs has just meeting0
+    assert personList.get(0).getMeetingIds().size() == 1;
+    assert personList.get(0).getMeetingIds().contains("meeting0");
+    // ...and the person's list of role meetings has just meeting1
+    assert personList.get(0).getRoleMeetingIds().size() == 1;
+    assert personList.get(0).getRoleMeetingIds().contains("meeting1");
+    // ...and the person's list of speech meetings has just meeting2
+    assert personList.get(0).getSpeechMeetingIds().size() == 1;
+    assert personList.get(0).getSpeechMeetingIds().contains("meeting2");
   }
 
   @Test
@@ -191,5 +250,17 @@ public class AirtableServiceTest {
 
   private String arrayWrapJsonRecord(String record) {
     return String.format("{\"records\":[%s]}", record);
+  }
+
+  private String generateMeetingJsonWithSinglePersonRole(
+      String meetingId, String roleType, String personId) {
+    return "{"
+        + String.format("\"id\":\"%s\",", meetingId)
+        + "\"createdTime\":\"2019-12-11T21:30:21.000Z\","
+        + "\"fields\": {"
+        + "\"Meeting Date\": \"2019-12-11\","
+        + String.format("\"%s\": [ \"%s\" ]", roleType, personId)
+        + "}"
+        + "}";
   }
 }

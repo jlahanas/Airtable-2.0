@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.speakupcambridge.exceptions.UnexpectedJsonFormatException;
-import com.speakupcambridge.model.MailchimpPerson;
+import com.speakupcambridge.model.mailchimp.MailchimpPerson;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

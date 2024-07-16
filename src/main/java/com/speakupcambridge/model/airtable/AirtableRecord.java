@@ -1,4 +1,4 @@
-package com.speakupcambridge.model;
+package com.speakupcambridge.model.airtable;
 
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;

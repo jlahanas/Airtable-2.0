@@ -1,6 +1,6 @@
-package com.speakupcambridge.repository;
+package com.speakupcambridge.repository.airtable;
 
-import com.speakupcambridge.model.AirtableMeeting;
+import com.speakupcambridge.model.airtable.AirtableMeeting;
 
 import java.util.List;
 

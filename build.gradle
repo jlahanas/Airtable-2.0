@@ -39,6 +39,8 @@ dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.2.Final'
     // Dotenv for loading env
     implementation 'io.github.cdimascio:java-dotenv:5.2.2'
+    // Apache commons
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
 }
 
 test {
@@ -47,3 +49,11 @@ test {
     systemProperties env.allVariables()
     useJUnitPlatform()
 }
+
+bootRun {
+    systemProperties env.allVariables()
+}
+
+//application {
+//    systemProperties env.allVariables()
+//}
